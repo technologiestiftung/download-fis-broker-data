@@ -14,17 +14,29 @@ get_data_from_wfs.py -l s_wfs_baumbestand -v
 usage: get_data_from_wfs.py [-h] [-l LAYER] [-v] [-fp FILE_PATH] [-fn FILE_NAME] [-url BASE_URL] [-of OUTPUT_FORMAT]
 
 options:
+
   -h, --help            show this help message and exit
+
   -l LAYER, --layer LAYER
+
                         The name of the layer. Use '-' instead of ':'
+
   -v, --verbose         Show more info
+
   -fp FILE_PATH, --file_path FILE_PATH
+
                         Base path to store files with trailing slash
+
   -fn FILE_NAME, --file_name FILE_NAME
+
                         Optional, by default it will be named like the layer.
+
   -url BASE_URL, --base_url BASE_URL
+
                         Optional, by default FIS broker URL.
+
   -of OUTPUT_FORMAT, --output_format OUTPUT_FORMAT
+
                         Optional, by default 'text/xml; subtype=gml/3.2.1'
 
 
