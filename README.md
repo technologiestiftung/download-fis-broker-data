@@ -11,6 +11,8 @@ get_data_from_wfs.py -l s_wfs_baumbestand -v
 
 ## Usage
 
+<pre>
+
 usage: get_data_from_wfs.py [-h] [-l LAYER] [-v] [-fp FILE_PATH] [-fn FILE_NAME] [-url BASE_URL] [-of OUTPUT_FORMAT]
 
 options:
@@ -38,7 +40,8 @@ options:
   -of OUTPUT_FORMAT, --output_format OUTPUT_FORMAT
 
                         Optional, by default 'text/xml; subtype=gml/3.2.1'
-
+                        
+</pre>
 
 ## Contributors ✨
 
