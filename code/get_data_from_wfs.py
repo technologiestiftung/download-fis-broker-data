@@ -69,6 +69,7 @@ def get_wfs(wfs_layer_url, output_format, output_file):
     wfs = WebFeatureService(url=wfs_layer_url)
     wfs_layer = list(wfs.contents)[-1]
 
+    # Get the SRS
 
     params = dict(service='WFS', version="1.0.0", request='GetCapabilities', typeName=wfs_layer, outputFormat=output_format)
     r_url = requests.Request('GET', wfs_layer_url, params=params).prepare().url
@@ -86,18 +87,12 @@ def get_wfs(wfs_layer_url, output_format, output_file):
 
     wfs_srs = str( layers [wfs_layer] ['srs'] )
 
-
-    # print (wfs_srs)
-
     logging.info('Layer from wfs ' + wfs_layer)
-
 
     params = dict(service='WFS', version="1.0.0", request='GetFeature',
         typeName=wfs_layer, outputFormat=output_format)
 
-    # Parse the URL with parameters
     wfs_url = requests.Request('GET', wfs_layer_url, params=params).prepare().url
-
 
     # Read data from URL
     logging.info('Requesting WFS from ' + wfs_url)
