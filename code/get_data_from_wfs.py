@@ -1,10 +1,12 @@
 import geopandas as gpd
 from owslib.wfs import WebFeatureService
-from requests import Request
+# from requests import Request
+import requests
 import warnings
 import os, ssl
 import argparse
 import logging
+import xml.etree.ElementTree as ET
 
 
 ###   Parameters   ###
@@ -66,18 +68,50 @@ def get_wfs(wfs_layer_url, output_format, output_file):
 
     wfs = WebFeatureService(url=wfs_layer_url)
     wfs_layer = list(wfs.contents)[-1]
+
+
+    params = dict(service='WFS', version="1.0.0", request='GetCapabilities', typeName=wfs_layer, outputFormat=output_format)
+    r_url = requests.Request('GET', wfs_layer_url, params=params).prepare().url
+    r = requests.get (r_url)
+
+    root = ET.fromstring(r.content)
+    namespaces = {
+        'wfs': 'http://www.opengis.net/wfs'
+    }
+    layers = {}
+    for feature_type in root.findall('wfs:FeatureTypeList/wfs:FeatureType', namespaces):
+        layers[feature_type.find('wfs:Name', namespaces).text] = {
+            'srs': feature_type.find('wfs:SRS', namespaces).text,
+        }
+
+    wfs_srs = str( layers [wfs_layer] ['srs'] )
+
+
+    # print (wfs_srs)
+
     logging.info('Layer from wfs ' + wfs_layer)
+
+
     params = dict(service='WFS', version="1.0.0", request='GetFeature',
         typeName=wfs_layer, outputFormat=output_format)
 
     # Parse the URL with parameters
-    q = Request('GET', wfs_layer_url, params=params).prepare().url
-    logging.info('Request WFS from ' + q)
+    wfs_url = requests.Request('GET', wfs_layer_url, params=params).prepare().url
+
+
     # Read data from URL
-    data = gpd.read_file(q)
+    logging.info('Requesting WFS from ' + wfs_url)
+    gdf = gpd.read_file(wfs_url)
+    gdf = gdf.set_crs(  wfs_srs  )
+
+    #convert data
+    logging.info('CRS: ' + str (  gdf.crs ) )
+
+    gdf = gdf.to_crs(4326)
+    logging.info('CRS: '  + str (  gdf.crs ) )
 
     logging.info('Writting to file' + output_file)
-    data.to_file(output_file, driver="GeoJSON")
+    gdf.to_file(output_file, driver="GeoJSON")
 
     logging.info('All done')
 
