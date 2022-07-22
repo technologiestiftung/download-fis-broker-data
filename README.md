@@ -5,80 +5,28 @@
 _This is a script to fetch data from the Fis-Broker of Berlin and save it as a GeoJSON._
 
 
-## Inputs
+## Example usage
 
-- New tree data in GML or GeoJSON format
-- config.yaml that configurates paths, tablesnames, overwritting, mapping of column names and columns to update
+get_data_from_wfs.py -l s_wfs_baumbestand -v
 
-```yml
-database:
-  parameter-path: .env
-  data-table-name: trees
-  replace-table: True
+## Usage
 
-new-data-paths:
-  - tree_data/data_files/s_wfs_baumbestand.gml
-  - tree_data/data_files/s_wfs_baumbestand_an.gml
+usage: get_data_from_wfs.py [-h] [-l LAYER] [-v] [-fp FILE_PATH] [-fn FILE_NAME] [-url BASE_URL] [-of OUTPUT_FORMAT]
 
-data-schema:
-  mapping:
-    art_bot: artbot
-    art_dtsch: artdtsch
-    gattung_deutsch: gattungdeutsch
-    gml_id: gmlid
-  merge-on:
-    - gmlid
-  update:
-    - standalter
-    - baumhoehe
-    - kronedurch
-    - stammumfg
-    - gmlid
-    - lat
-    - lng
-    - standortnr
-    - kennzeich
-    - artdtsch
-    - artbot
-    - gattungdeutsch
-    - gattung
-    - pflanzjahr
-```
+options:
+  -h, --help            show this help message and exit
+  -l LAYER, --layer LAYER
+                        The name of the layer. Use '-' instead of ':'
+  -v, --verbose         Show more info
+  -fp FILE_PATH, --file_path FILE_PATH
+                        Base path to store files with trailing slash
+  -fn FILE_NAME, --file_name FILE_NAME
+                        Optional, by default it will be named like the layer.
+  -url BASE_URL, --base_url BASE_URL
+                        Optional, by default FIS broker URL.
+  -of OUTPUT_FORMAT, --output_format OUTPUT_FORMAT
+                        Optional, by default 'text/xml; subtype=gml/3.2.1'
 
-- .env that contains database credentials
-
-```yml
-PG_SERVER=
-PG_PORT=
-PG_USER=
-PG_PASS=
-PG_DB=
-```
-
-## Example Usage
-
-To save newest tree data from the FIS-Broker locally run
-
-```bash
-python tree_data/get_data_from_wfs.py
-```
-
-To update database run
-
-```bash
-python tree_data/main.py
-```
-
-## Updating Caretaker labels
-
-In Gieß den Kiez it is visible which trees are maintained by Berlin's street and green space offices. However, this information is not included in the offical Berlin tree dataset. Instead, Berlin's green space offices provide separate Excel tables containing the trees they water. This information needs to be entered 'manually' into the database table "trees" using SQL commands. The procedure is as follows:
-
-1. Extract only the FIS-Broker-ID'S (gmlids) from the Excel sheet to a csv file
-2. Create a new table with this ID's in the database: `CREATE TABLE caretaker_ids(id VARCHAR NOT NULL)`
-3. Import ID’s from CSV-Table into the database table
-4. Delete old caretaker labels from the trees table: `UPDATE trees SET caretaker = NULL`
-5. JOIN new caretaker labels to the trees: `UPDATE trees t SET caretaker = 'Bezirk XY' FROM caretaker_ids c WHERE t.gmlid = c.id`
-6. Delete the no longer needed table: `DROP TABLE caretaker_ids`
 
 ## Contributors ✨
 
